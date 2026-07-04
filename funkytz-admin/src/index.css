@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --color-funky-orange: #FF5722;
+  --color-funky-orange-dark: #E0431A;
+  --color-funky-black: #0F0F0F;
+  --color-funky-teal: #1FAFA0;
+  --color-funky-cream: #F7F5F2;
+  --color-funky-yellow: #FFC400;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-funky-cream);
+    color: var(--color-funky-black);
+  }
+  ::selection {
+    background-color: var(--color-funky-orange);
+    color: white;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.shadow-comic {
+  box-shadow: 4px 4px 0px rgba(15,15,15,1);
+}
+.shadow-comic-sm {
+  box-shadow: 2px 2px 0px rgba(15,15,15,1);
+}

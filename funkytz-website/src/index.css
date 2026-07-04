@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #0F0F0F;
+  background-color: #ffffff;
+}
+
+/* Comic-style outlined wordmark, echoing the FUNKY+z logo treatment */
+.comic-text {
+  font-family: 'Archivo Black', sans-serif;
+  color: #ffffff;
+  -webkit-text-stroke: 3px #0F0F0F;
+  paint-order: stroke fill;
+  text-shadow:
+    5px 5px 0 #1FAFA0,
+    5px 5px 0 0px #0F0F0F;
+}
+
+.comic-text-sm {
+  font-family: 'Archivo Black', sans-serif;
+  color: #ffffff;
+  -webkit-text-stroke: 1.5px #0F0F0F;
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 #1FAFA0;
+}
+
+/* Torn paper / spray badge shape used for sale callouts */
+.torn-badge {
+  background: #0F0F0F;
+  clip-path: polygon(
+    2% 8%, 12% 2%, 24% 6%, 36% 1%, 48% 5%, 61% 0%, 74% 4%, 88% 1%, 100% 7%,
+    97% 22%, 100% 38%, 95% 52%, 100% 68%, 96% 84%, 100% 95%, 86% 99%,
+    73% 95%, 60% 100%, 47% 96%, 34% 100%, 21% 95%, 8% 99%, 2% 86%,
+    5% 70%, 0% 54%, 4% 38%, 0% 22%
+  );
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid #1FAFA0;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar for horizontal product rails */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #0F0F0F;
+  border-radius: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes slide-right {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-slide-right {
+  animation: slide-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes loading-bar {
+  0% { left: -50%; width: 30%; }
+  50% { width: 50%; }
+  100% { left: 120%; width: 20%; }
+}
