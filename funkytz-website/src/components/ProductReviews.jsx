@@ -64,14 +64,7 @@ export default function ProductReviews({ productId }) {
   }, [productId]);
 
   if (loading) return null;
-  if (data.count === 0) {
-    return (
-      <section className="mt-16 border-t border-black/10 pt-10">
-        <h2 className="font-display text-xl mb-3">REVIEWS</h2>
-        <p className="text-sm text-black/50">No reviews yet for this product.</p>
-      </section>
-    );
-  }
+  if (data.count === 0) return null;
 
   return (
     <section className="mt-16 border-t border-black/10 pt-10">

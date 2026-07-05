@@ -202,4 +202,18 @@ export async function updateProduct(req, res) {
   }
 }
 
-
+export async function deleteProduct(req, res) {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    
+    if (product.images && product.images.length > 0) {
+      await Promise.all(product.images.map((img) => deleteFromCloudinary(img.publicId)));
+    }
+    
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete product', error: err.message });
+  }
+}

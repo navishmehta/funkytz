@@ -4,13 +4,13 @@ import { Shirt, Tags, Boxes, AlertTriangle, IndianRupee } from 'lucide-react';
 import client from '../api/client';
 
 const StatCard = ({ icon: Icon, label, value, accent }) => (
-  <div className="bg-white rounded-lg shadow-comic-sm p-5 flex items-center gap-4">
+  <div className="bg-white rounded-xl shadow-sm border border-black/5 p-5 flex items-center gap-4 transition-shadow hover:shadow-md">
     <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${accent}`}>
       <Icon size={20} className="text-white" />
     </div>
     <div>
       <p className="text-black/50 text-xs font-semibold">{label}</p>
-      <p className="font-display text-xl mt-0.5">{value}</p>
+      <p className="font-bold text-2xl tracking-tight mt-0.5">{value}</p>
     </div>
   </div>
 );
@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl mb-6">DASHBOARD</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Overview</h1>
 
       {error && <p className="text-red-600 text-sm font-semibold mb-4">{error}</p>}
 
@@ -65,9 +65,9 @@ export default function Dashboard() {
             <StatCard icon={IndianRupee} label="Avg. Price" value={`₹${avgPrice}`} accent="bg-funky-orange" />
           </div>
 
-          <div className="bg-white rounded-lg shadow-comic-sm p-5">
+          <div className="bg-white rounded-xl shadow-sm border border-black/5 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-base">CATALOG BY CATEGORY</h2>
+              <h2 className="text-sm font-bold tracking-wide text-black/70 uppercase">Catalog by Category</h2>
               <Link to="/products" className="text-xs font-bold text-funky-orange hover:underline">
                 Browse full catalog
               </Link>
@@ -87,8 +87,8 @@ export default function Dashboard() {
           </div>
 
           {outOfStock.length > 0 && (
-            <div className="bg-white rounded-lg shadow-comic-sm p-5 mt-6">
-              <h2 className="font-display text-base mb-4">OUT OF STOCK</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-black/5 p-5 mt-6">
+              <h2 className="text-sm font-bold tracking-wide text-red-600 uppercase mb-4">Out of Stock Alerts</h2>
               <div className="divide-y divide-black/5">
                 {outOfStock.map((p) => (
                   <div key={p._id} className="py-3 flex items-center justify-between text-sm">

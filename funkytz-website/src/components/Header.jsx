@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, Heart, User, ShoppingCart, Menu, X } from 'lucide-react';
+import { Search, Heart, ShoppingCart, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useProducts } from '../context/ProductContext';
@@ -124,9 +124,6 @@ export default function Header() {
               </span>
             )}
           </Link>
-          <button aria-label="Account" className="focus-ring rounded hidden sm:block hover:text-funky-orange transition-colors">
-            <User size={20} />
-          </button>
           <Link to="/cart" aria-label="Cart" className="relative focus-ring rounded hover:text-funky-orange transition-colors">
             <ShoppingCart size={20} />
             {cartCount > 0 && (

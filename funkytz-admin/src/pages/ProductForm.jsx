@@ -130,9 +130,9 @@ export default function ProductForm() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl mb-6">{isEdit ? 'EDIT PRODUCT' : 'NEW PRODUCT'}</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">{isEdit ? 'EDIT PRODUCT' : 'NEW PRODUCT'}</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-comic-sm p-6 max-w-2xl space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-black/5 p-6 max-w-2xl space-y-4">
         <div>
           <label className="block text-xs font-bold mb-1.5">Product name</label>
           <input value={form.name} onChange={set('name')} required

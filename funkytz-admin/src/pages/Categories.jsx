@@ -64,7 +64,7 @@ export default function Categories() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl">CATEGORIES</h1>
+        <h1 className="text-2xl font-bold tracking-tight">CATEGORIES</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-1.5 bg-funky-orange text-white font-bold text-sm px-4 py-2.5 rounded-md hover:bg-funky-orange-dark transition-colors"
@@ -78,7 +78,7 @@ export default function Categories() {
       ) : (
         <>
           {/* Desktop Table View */}
-          <div className="hidden md:block bg-white rounded-lg shadow-comic-sm overflow-hidden">
+          <div className="hidden md:block bg-white rounded-lg shadow-sm border border-black/5 overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-funky-cream text-left">
                 <tr>
@@ -116,7 +116,7 @@ export default function Categories() {
           {/* Mobile Card List View */}
           <div className="md:hidden space-y-4">
             {categories.map((c) => (
-              <div key={c._id} className="bg-white rounded-lg shadow-comic-sm p-4 flex items-center justify-between gap-4">
+              <div key={c._id} className="bg-white rounded-lg shadow-sm border border-black/5 p-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl bg-funky-cream p-2.5 rounded-xl shrink-0 border border-black/5">{c.icon}</span>
                   <div>
@@ -136,7 +136,7 @@ export default function Categories() {
               </div>
             ))}
             {categories.length === 0 && (
-              <div className="bg-white rounded-lg shadow-comic-sm p-8 text-center text-black/40">No categories yet.</div>
+              <div className="bg-white rounded-lg shadow-sm border border-black/5 p-8 text-center text-black/40">No categories yet.</div>
             )}
           </div>
         </>
@@ -144,7 +144,7 @@ export default function Categories() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-comic p-6 w-full max-w-sm">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border border-black/5 p-6 w-full max-w-sm relative animate-scale-in">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-lg">{editingId ? 'EDIT CATEGORY' : 'NEW CATEGORY'}</h2>
               <button type="button" onClick={() => setShowForm(false)}><X size={18} /></button>

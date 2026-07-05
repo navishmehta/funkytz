@@ -23,8 +23,8 @@ export default function Layout() {
   const SidebarContent = () => (
     <>
       <div className="px-6 py-6 border-b border-white/10">
-        <p className="font-display text-xl text-white tracking-tight">FUNKYTZ</p>
-        <p className="text-white/50 text-xs font-semibold mt-0.5 tracking-widest">ADMIN PANEL</p>
+        <p className="text-2xl font-bold text-white tracking-tighter">FUNKYTZ</p>
+        <p className="text-white/50 text-xs font-semibold mt-0.5 tracking-widest uppercase">Admin Panel</p>
       </div>
       <nav className="flex-1 px-3 py-5 space-y-1">
         {navItems.map(({ to, label, icon: Icon, end }) => (
@@ -34,8 +34,8 @@ export default function Layout() {
             end={end}
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-semibold transition-colors ${
-                isActive ? 'bg-funky-orange text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+              `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-semibold transition-all ${
+                isActive ? 'bg-white/10 text-white font-bold relative after:absolute after:left-0 after:top-2 after:bottom-2 after:w-1 after:bg-funky-orange after:rounded-r-md' : 'text-white/60 hover:bg-white/5 hover:text-white'
               }`
             }
           >
@@ -51,7 +51,7 @@ export default function Layout() {
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-md text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-md text-sm font-semibold text-white/60 hover:bg-white/5 hover:text-white transition-colors"
         >
           <LogOut size={16} /> Log out
         </button>
@@ -77,8 +77,8 @@ export default function Layout() {
       )}
 
       <div className="flex-1 min-w-0">
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-funky-black text-white sticky top-0 z-30">
-          <p className="font-display text-lg">FUNKYTZ ADMIN</p>
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-funky-black text-white sticky top-0 z-30 shadow-md">
+          <p className="text-lg font-bold tracking-tight">FUNKYTZ ADMIN</p>
           <button onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Menu size={22} />
           </button>

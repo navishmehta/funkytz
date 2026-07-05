@@ -93,7 +93,7 @@ export default function Reviews() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-        <h1 className="font-display text-2xl">REVIEWS</h1>
+        <h1 className="text-2xl font-bold tracking-tight">REVIEWS</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-1.5 bg-funky-orange text-white font-bold text-sm px-4 py-2.5 rounded-md hover:bg-funky-orange-dark transition-colors"
@@ -114,11 +114,11 @@ export default function Reviews() {
       {loading ? (
         <p className="text-sm text-black/50">Loading...</p>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-comic-sm p-10 text-center text-black/40">No reviews yet.</div>
+        <div className="bg-white rounded-lg shadow-sm border border-black/5 p-10 text-center text-black/40">No reviews yet.</div>
       ) : (
         <div className="space-y-3">
           {filtered.map((r) => (
-            <div key={r._id} className={`bg-white rounded-lg shadow-comic-sm p-5 ${!r.isVisible ? 'opacity-50' : ''}`}>
+            <div key={r._id} className={`bg-white rounded-lg shadow-sm border border-black/5 p-5 ${!r.isVisible ? 'opacity-50' : ''}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-semibold text-sm">{r.customerName}</p>
@@ -147,7 +147,7 @@ export default function Reviews() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-comic p-6 w-full max-w-sm">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border border-black/5 p-6 w-full max-w-sm relative animate-scale-in">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-lg">{editingId ? 'EDIT REVIEW' : 'NEW REVIEW'}</h2>
               <button type="button" onClick={() => setShowForm(false)}><X size={18} /></button>

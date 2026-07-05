@@ -28,9 +28,3 @@
   font-family: var(--font-display);
 }
 
-.shadow-comic {
-  box-shadow: 4px 4px 0px rgba(15,15,15,1);
-}
-.shadow-comic-sm {
-  box-shadow: 2px 2px 0px rgba(15,15,15,1);
-}

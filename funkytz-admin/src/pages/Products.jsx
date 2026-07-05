@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, EyeOff, Eye, SlidersHorizontal } from 'lucide-react';
+import { Plus, Pencil, EyeOff, Eye, SlidersHorizontal, Trash2, X } from 'lucide-react';
 import client from '../api/client';
 
 const emptyFilters = { category: 'all', color: 'all', size: 'all', minPrice: '', maxPrice: '', stock: 'all' };
@@ -12,6 +12,9 @@ export default function Products() {
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState(emptyFilters);
   const [showFilters, setShowFilters] = useState(false);
+  const [deleteProduct, setDeleteProduct] = useState(null);
+  const [deleteCode, setDeleteCode] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -31,6 +34,22 @@ export default function Products() {
     if (!confirm(`${p.isActive ? 'Hide' : 'Show'} "${p.name}" ${p.isActive ? 'from' : 'on'} the storefront?`)) return;
     await client.put(`/products/${p._id}`, { isActive: String(!p.isActive) });
     load();
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (deleteCode !== '1001') {
+      setDeleteError('Incorrect code.');
+      return;
+    }
+    try {
+      await client.delete(`/products/${deleteProduct._id}`);
+      setDeleteProduct(null);
+      setDeleteCode('');
+      setDeleteError('');
+      load();
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || 'Failed to delete');
+    }
   };
 
   // Distinct filter options, derived straight from the current catalog
@@ -54,7 +73,7 @@ export default function Products() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-        <h1 className="font-display text-2xl">PRODUCTS</h1>
+        <h1 className="text-2xl font-bold tracking-tight">PRODUCTS</h1>
         <Link
           to="/products/new"
           className="flex items-center gap-1.5 bg-funky-orange text-white font-bold text-sm px-4 py-2.5 rounded-md hover:bg-funky-orange-dark transition-colors"
@@ -84,7 +103,7 @@ export default function Products() {
       </div>
 
       {showFilters && (
-        <div className="bg-white rounded-lg shadow-comic-sm p-4 mb-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4 mb-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <div>
             <label className="block text-[11px] font-bold mb-1 text-black/60">Category</label>
             <select
@@ -154,7 +173,7 @@ export default function Products() {
       ) : (
         <>
           {/* Desktop Table View */}
-          <div className="hidden md:block bg-white rounded-lg shadow-comic-sm overflow-hidden">
+          <div className="hidden md:block bg-white rounded-lg shadow-sm border border-black/5 overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-funky-cream text-left">
                 <tr>
@@ -193,13 +212,30 @@ export default function Products() {
                         {p.isActive ? 'Live' : 'Hidden'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <Link to={`/products/${p._id}/edit`} className="p-1.5 inline-block hover:text-funky-orange" aria-label="Edit">
-                        <Pencil size={15} />
-                      </Link>
-                      <button onClick={() => toggleActive(p)} className="p-1.5 hover:text-funky-orange" aria-label="Toggle visibility">
-                        {p.isActive ? <EyeOff size={15} /> : <Eye size={15} />}
-                      </button>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link 
+                          to={`/products/${p._id}/edit`} 
+                          className="p-2 text-black/60 hover:text-funky-orange hover:bg-funky-orange/10 rounded-md transition-colors" 
+                          title="Edit Product"
+                        >
+                          <Pencil size={16} />
+                        </Link>
+                        <button 
+                          onClick={() => toggleActive(p)} 
+                          className="p-2 text-black/60 hover:text-funky-orange hover:bg-funky-orange/10 rounded-md transition-colors" 
+                          title={p.isActive ? "Hide Product" : "Show Product"}
+                        >
+                          {p.isActive ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                        <button 
+                          onClick={() => { setDeleteProduct(p); setDeleteCode(''); setDeleteError(''); }} 
+                          className="p-2 text-black/60 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" 
+                          title="Delete Product"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -213,7 +249,7 @@ export default function Products() {
           {/* Mobile Card List View */}
           <div className="md:hidden space-y-4">
             {filtered.map((p) => (
-              <div key={p._id} className={`bg-white rounded-lg shadow-comic-sm p-4 flex gap-4 ${!p.isActive ? 'opacity-60' : ''}`}>
+              <div key={p._id} className={`bg-white rounded-lg shadow-sm border border-black/5 p-4 flex gap-4 ${!p.isActive ? 'opacity-60' : ''}`}>
                 <div className="w-20 h-24 rounded-lg bg-funky-cream overflow-hidden shrink-0 border border-black/5">
                   {p.images?.[0]?.url && (
                     <img src={p.images[0].url} alt={p.name} className="w-full h-full object-cover" />
@@ -239,11 +275,23 @@ export default function Products() {
                   <div className="mt-2 flex items-center justify-between border-t border-black/5 pt-2">
                     <span className="text-xs text-black/50">Stock: <strong className="text-funky-black">{p.stock}</strong></span>
                     <div className="flex gap-1">
-                      <Link to={`/products/${p._id}/edit`} className="p-1 text-black/60 hover:text-funky-orange" aria-label="Edit">
-                        <Pencil size={15} />
+                      <Link 
+                        to={`/products/${p._id}/edit`} 
+                        className="p-2 text-black/60 hover:text-funky-orange hover:bg-funky-orange/10 rounded-md transition-colors"
+                      >
+                        <Pencil size={16} />
                       </Link>
-                      <button onClick={() => toggleActive(p)} className="p-1 text-black/60 hover:text-funky-orange" aria-label="Toggle visibility">
-                        {p.isActive ? <EyeOff size={15} /> : <Eye size={15} />}
+                      <button 
+                        onClick={() => toggleActive(p)} 
+                        className="p-2 text-black/60 hover:text-funky-orange hover:bg-funky-orange/10 rounded-md transition-colors"
+                      >
+                        {p.isActive ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                      <button 
+                        onClick={() => { setDeleteProduct(p); setDeleteCode(''); setDeleteError(''); }} 
+                        className="p-2 text-black/60 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -251,10 +299,58 @@ export default function Products() {
               </div>
             ))}
             {filtered.length === 0 && (
-              <div className="bg-white rounded-lg shadow-comic-sm p-8 text-center text-black/40">No products match these filters.</div>
+              <div className="bg-white rounded-lg shadow-sm border border-black/5 p-8 text-center text-black/40">No products match these filters.</div>
             )}
           </div>
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-md border border-black/5 max-w-md w-full p-6 animate-scale-in relative">
+            <button 
+              onClick={() => setDeleteProduct(null)} 
+              className="absolute top-4 right-4 p-1 text-black/50 hover:text-black hover:bg-black/5 rounded-full transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <h2 className="text-2xl font-bold tracking-tight text-red-600 mb-2">DELETE PRODUCT</h2>
+            <p className="text-sm text-black/70 mb-4">
+              Are you sure you want to delete <strong>{deleteProduct.name}</strong>? This action cannot be undone.
+            </p>
+            
+            <div className="mb-4">
+              <input
+                type="text"
+                maxLength="4"
+                value={deleteCode}
+                onChange={(e) => setDeleteCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="0000"
+                className="w-full text-center text-2xl tracking-[0.5em] font-mono border-2 border-black/10 rounded-lg px-4 py-3 outline-none focus:border-red-500"
+                autoFocus
+              />
+              {deleteError && <p className="text-red-500 text-xs font-bold mt-2 text-center">{deleteError}</p>}
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setDeleteProduct(null)}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-black/10 font-bold hover:bg-black/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteSubmit}
+                disabled={deleteCode.length !== 4}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition-colors shadow-sm border border-black/5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete Forever
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

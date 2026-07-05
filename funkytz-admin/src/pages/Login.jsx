@@ -28,10 +28,10 @@ export default function Login() {
     <div className="min-h-screen bg-funky-black flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <p className="font-display text-3xl text-white tracking-tight">FUNKYTZ</p>
+          <p className="text-2xl font-bold tracking-tight text-white tracking-tight">FUNKYTZ</p>
           <p className="text-white/50 text-xs font-semibold mt-1 tracking-widest">ADMIN PANEL</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-comic p-6 sm:p-8">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-black/5 p-6 sm:p-8">
           <h1 className="font-display text-lg mb-6">SIGN IN</h1>
 
           <label className="block text-xs font-bold mb-1.5 text-black/70">Username</label>
