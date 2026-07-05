@@ -4,6 +4,7 @@ const imageSchema = new mongoose.Schema(
   {
     url: { type: String, required: true },
     publicId: { type: String }, // cloudinary public_id, needed to delete image later
+    color: { type: String }, // specific color for this photo
   },
   { _id: false }
 );

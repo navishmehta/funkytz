@@ -29,6 +29,7 @@ export default function ProductForm() {
   const [existingImages, setExistingImages] = useState([]); // {url, publicId}
   const [removeImages, setRemoveImages] = useState([]); // publicIds to delete
   const [newFiles, setNewFiles] = useState([]); // File[]
+  const [newImageColors, setNewImageColors] = useState([]); // string[]
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(isEdit);
@@ -71,9 +72,13 @@ export default function ProductForm() {
   const handleFilesSelected = (e) => {
     const files = Array.from(e.target.files || []);
     setNewFiles((prev) => [...prev, ...files].slice(0, 6));
+    setNewImageColors((prev) => [...prev, ...files.map(() => '')].slice(0, 6));
   };
 
-  const removeNewFile = (idx) => setNewFiles((prev) => prev.filter((_, i) => i !== idx));
+  const removeNewFile = (idx) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== idx));
+    setNewImageColors((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const toggleRemoveExisting = (publicId) => {
     setRemoveImages((prev) => (prev.includes(publicId) ? prev.filter((id2) => id2 !== publicId) : [...prev, publicId]));
@@ -99,6 +104,11 @@ export default function ProductForm() {
       fd.append('newArrival', String(form.newArrival));
       fd.append('trending', String(form.trending));
       if (removeImages.length) fd.append('removeImages', JSON.stringify(removeImages));
+      
+      const existingImageColorsPayload = existingImages.map(img => ({ publicId: img.publicId, color: img.color || '' }));
+      fd.append('existingImageColors', JSON.stringify(existingImageColorsPayload));
+      fd.append('newImageColors', JSON.stringify(newImageColors));
+      
       newFiles.forEach((file) => fd.append('images', file));
 
       if (isEdit) {
@@ -115,6 +125,8 @@ export default function ProductForm() {
   };
 
   if (loading) return <p className="text-sm text-black/50">Loading...</p>;
+
+  const availableColors = form.colors.split(',').map((s) => s.trim()).filter(Boolean);
 
   return (
     <div>
@@ -199,31 +211,51 @@ export default function ProductForm() {
           <label className="block text-xs font-bold mb-2">Images</label>
 
           {existingImages.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-4 mb-4">
               {existingImages.map((img) => (
-                <div key={img.publicId} className="relative">
-                  <img src={img.url} alt="" className={`w-16 h-16 object-cover rounded-md ${removeImages.includes(img.publicId) ? 'opacity-30' : ''}`} />
-                  <button
-                    type="button"
-                    onClick={() => toggleRemoveExisting(img.publicId)}
-                    className="absolute -top-1.5 -right-1.5 bg-white rounded-full shadow p-0.5"
-                    aria-label="Remove image"
+                <div key={img.publicId} className="relative flex flex-col items-center gap-1">
+                  <div className="relative">
+                    <img src={img.url} alt="" className={`w-16 h-16 object-cover rounded-md ${removeImages.includes(img.publicId) ? 'opacity-30' : ''}`} />
+                    <button
+                      type="button"
+                      onClick={() => toggleRemoveExisting(img.publicId)}
+                      className="absolute -top-1.5 -right-1.5 bg-white rounded-full shadow p-0.5"
+                      aria-label="Remove image"
+                    >
+                      <X size={13} className={removeImages.includes(img.publicId) ? 'text-black/30' : 'text-red-600'} />
+                    </button>
+                  </div>
+                  <select 
+                    value={img.color || ''} 
+                    onChange={(e) => setExistingImages(prev => prev.map(p => p.publicId === img.publicId ? { ...p, color: e.target.value } : p))}
+                    className="text-[10px] w-[72px] p-1 border border-black/20 rounded outline-none bg-white"
                   >
-                    <X size={13} className={removeImages.includes(img.publicId) ? 'text-black/30' : 'text-red-600'} />
-                  </button>
+                    <option value="">All Colors</option>
+                    {availableColors.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
                 </div>
               ))}
             </div>
           )}
 
           {newFiles.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-4 mb-4">
               {newFiles.map((file, i) => (
-                <div key={i} className="relative">
-                  <img src={URL.createObjectURL(file)} alt="" className="w-16 h-16 object-cover rounded-md border-2 border-funky-teal" />
-                  <button type="button" onClick={() => removeNewFile(i)} className="absolute -top-1.5 -right-1.5 bg-white rounded-full shadow p-0.5">
-                    <X size={13} className="text-red-600" />
-                  </button>
+                <div key={i} className="relative flex flex-col items-center gap-1">
+                  <div className="relative">
+                    <img src={URL.createObjectURL(file)} alt="" className="w-16 h-16 object-cover rounded-md border-2 border-funky-teal" />
+                    <button type="button" onClick={() => removeNewFile(i)} className="absolute -top-1.5 -right-1.5 bg-white rounded-full shadow p-0.5">
+                      <X size={13} className="text-red-600" />
+                    </button>
+                  </div>
+                  <select 
+                    value={newImageColors[i] || ''} 
+                    onChange={(e) => setNewImageColors(prev => prev.map((c, idx) => idx === i ? e.target.value : c))}
+                    className="text-[10px] w-[72px] p-1 border border-funky-teal rounded outline-none bg-white"
+                  >
+                    <option value="">All Colors</option>
+                    {availableColors.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
                 </div>
               ))}
             </div>

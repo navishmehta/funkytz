@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Check, ChevronRight, MessageCircle, ShoppingCart, Heart } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, MessageCircle, ShoppingCart, Heart } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -15,15 +15,47 @@ export default function ProductDetail() {
   const { addItem, buildWhatsAppLink } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
 
+  const scrollRef = useRef(null);
+
   const [activeImg, setActiveImg] = useState(0);
   const [size, setSize] = useState(null);
   const [color, setColor] = useState(null);
   const [qty, setQty] = useState(1);
   const [formError, setError] = useState('');
   const [added, setAdded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const [isHovering, setIsHovering] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
+
+  useEffect(() => {
+    if (product && !color && product.color?.length > 0) {
+      setColor(product.color[0]);
+    }
+  }, [product, color]);
+
+  const allImages = product?.images?.length > 0 
+    ? product.images.map(img => typeof img === 'string' ? { url: img } : img) 
+    : [{ url: product?.image }].filter(img => img.url);
+
+  const colorImages = allImages.filter(img => img.color && img.color.toLowerCase() === color?.toLowerCase());
+  const displayImages = colorImages.length > 0 ? colorImages : allImages;
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      // Add a small 2px threshold to account for fractional pixel rendering in browsers
+      setCanScrollLeft(scrollLeft > 2);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+  }, [displayImages]);
 
   if (loading) {
     return <div className="max-w-7xl mx-auto px-4 py-24 text-center text-black/50">Loading product...</div>;
@@ -40,8 +72,6 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images?.length > 0 ? product.images : [product.image].filter(Boolean);
-
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
@@ -51,6 +81,13 @@ export default function ProductDetail() {
   const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
 
   const actualPrice = getActualPrice(product);
+
+  const handleScroll = (direction) => {
+    if (scrollRef.current) {
+      const { clientWidth } = scrollRef.current;
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -clientWidth : clientWidth, behavior: 'smooth' });
+    }
+  };
 
   const validate = () => {
     if (!size) return 'Please select a size.';
@@ -85,6 +122,19 @@ export default function ProductDetail() {
     window.open(link, '_blank');
   };
 
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    if (!isWishlisted(product.id)) {
+      setIsAnimating(true);
+      toggleWishlist(product);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 250);
+    } else {
+      toggleWishlist(product);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <nav className="text-xs text-black/50 mb-6 flex items-center gap-1.5 flex-wrap">
@@ -98,12 +148,41 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Images */}
         <div>
-          <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory mb-3 aspect-[8/9] max-h-[420px] bg-funky-cream mx-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {images.map((img, i) => (
-              <div key={i} className="min-w-full snap-center flex-shrink-0 h-full flex items-center justify-center overflow-hidden">
-                <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
-              </div>
-            ))}
+          <div className="relative lg:hidden mb-3">
+            <div 
+              ref={scrollRef}
+              onScroll={checkScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory aspect-[8/9] max-h-[420px] bg-funky-cream mx-auto" 
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {displayImages.map((img, i) => (
+                <div key={i} className="min-w-full snap-center flex-shrink-0 h-full flex items-center justify-center overflow-hidden">
+                  <img src={img.url} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Arrows */}
+            {displayImages.length > 1 && (
+              <>
+                <button 
+                  onClick={() => handleScroll('left')}
+                  disabled={!canScrollLeft}
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur p-1.5 rounded-full shadow transition-colors focus-ring z-10 ${!canScrollLeft ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white'}`}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={20} className="text-black/80" />
+                </button>
+                <button 
+                  onClick={() => handleScroll('right')}
+                  disabled={!canScrollRight}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur p-1.5 rounded-full shadow transition-colors focus-ring z-10 ${!canScrollRight ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white'}`}
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={20} className="text-black/80" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Desktop Interactive Image */}
@@ -117,19 +196,19 @@ export default function ProductDetail() {
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  backgroundImage: `url(${images[activeImg]})`,
+                  backgroundImage: `url(${displayImages[activeImg]?.url})`,
                   backgroundPosition: `${mousePos.x}% ${mousePos.y}%`,
                   backgroundSize: '250%',
                   backgroundRepeat: 'no-repeat'
                 }}
               />
             ) : (
-              <img src={images[activeImg]} alt={product.name} className="w-full h-full object-cover pointer-events-none" />
+              <img src={displayImages[activeImg]?.url} alt={product.name} className="w-full h-full object-cover pointer-events-none" />
             )}
           </div>
 
           <div className="hidden lg:flex gap-3">
-            {images.map((img, i) => (
+            {displayImages.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setActiveImg(i)}
@@ -138,7 +217,7 @@ export default function ProductDetail() {
                 }`}
                 aria-label={`View image ${i + 1}`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={img.url} alt="" className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
@@ -154,13 +233,13 @@ export default function ProductDetail() {
           <div className="flex items-start justify-between gap-4 mb-3">
             <h1 className="font-display text-2xl sm:text-3xl leading-tight">{product.name}</h1>
             <button
-              onClick={() => toggleWishlist(product)}
+              onClick={handleWishlistClick}
               className="p-2 rounded-full focus-ring hover:bg-black/5 transition-colors shrink-0"
               aria-label="Toggle Wishlist"
             >
               <Heart 
                 size={24} 
-                className={isWishlisted(product.id) ? 'fill-funky-orange text-funky-orange' : 'text-black/40'} 
+                className={`${isWishlisted(product.id) || isAnimating ? 'fill-funky-orange text-funky-orange' : 'text-black/40'} ${isAnimating ? 'animate-heart-pop' : ''}`} 
               />
             </button>
           </div>
@@ -185,7 +264,7 @@ export default function ProductDetail() {
               {product.color.map((c) => (
                 <button
                   key={c}
-                  onClick={() => { setColor(c); setError(''); }}
+                  onClick={() => { setColor(c); setError(''); setActiveImg(0); }}
                   className={`px-4 py-2 rounded-md border text-sm font-semibold focus-ring transition-colors ${
                     color === c
                       ? 'border-funky-orange bg-funky-orange text-white'

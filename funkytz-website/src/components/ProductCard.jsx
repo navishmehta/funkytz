@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, X } from 'lucide-react';
 import { getActualPrice } from '../utils/pricing';
@@ -5,6 +6,22 @@ import { useWishlist } from '../context/WishlistContext';
 
 export default function ProductCard({ product, isWishlistPage }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
+  const [isAnimating, setIsAnimating] = useState(false);
+
+
+
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    if (!isWishlistPage && !isWishlisted(product.id)) {
+      setIsAnimating(true);
+      toggleWishlist(product);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 250);
+    } else {
+      toggleWishlist(product);
+    }
+  };
 
   return (
     <Link
@@ -28,10 +45,10 @@ export default function ProductCard({ product, isWishlistPage }) {
         ) : (
           <button
             aria-label="Add to wishlist"
-            onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+            onClick={handleWishlistClick}
             className="absolute top-2 right-2 z-10 bg-white/90 rounded-full p-1.5 hover:bg-white transition-colors focus-ring"
           >
-            <Heart size={15} fill={isWishlisted(product.id) ? "currentColor" : "none"} className={isWishlisted(product.id) ? "text-funky-orange" : ""} />
+            <Heart size={15} fill={isWishlisted(product.id) || isAnimating ? "currentColor" : "none"} className={`${isWishlisted(product.id) || isAnimating ? "text-funky-orange" : ""} ${isAnimating ? "animate-heart-pop" : ""}`} />
           </button>
         )}
         <img

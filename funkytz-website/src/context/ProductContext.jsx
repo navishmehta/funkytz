@@ -12,7 +12,7 @@ function normalizeProduct(p) {
     id: p.slug, // used for /product/:id routes
     mongoId: p._id, // needed when placing an order
     image: p.images?.[0]?.url || '',
-    images: (p.images || []).map((img) => img.url),
+    images: (p.images || []).map((img) => ({ url: img.url, color: img.color })),
     color: p.colors || [],
   };
 }

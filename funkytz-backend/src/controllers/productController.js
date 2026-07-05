@@ -107,10 +107,11 @@ export async function createProduct(req, res) {
 
     let images = [];
     if (req.files && req.files.length > 0) {
+      const newImageColors = parseArrayField(body.newImageColors);
       const uploads = await Promise.all(
         req.files.map((f) => uploadBufferToCloudinary(f.buffer))
       );
-      images = uploads;
+      images = uploads.map((u, i) => ({ ...u, color: newImageColors[i] || '' }));
     }
 
     const product = await Product.create({
@@ -172,10 +173,26 @@ export async function updateProduct(req, res) {
       product.images = product.images.filter((img) => !toRemove.includes(img.publicId));
     }
 
+    // Update existing image colors
+    if (body.existingImageColors) {
+      try {
+        const existingColors = JSON.parse(body.existingImageColors);
+        product.images.forEach((img) => {
+          const match = existingColors.find((c) => c.publicId === img.publicId);
+          if (match && match.color !== undefined) {
+            img.color = match.color;
+          }
+        });
+      } catch (e) {
+        console.warn("Failed to parse existingImageColors", e);
+      }
+    }
+
     // Append newly uploaded images
     if (req.files && req.files.length > 0) {
+      const newImageColors = parseArrayField(body.newImageColors);
       const uploads = await Promise.all(req.files.map((f) => uploadBufferToCloudinary(f.buffer)));
-      product.images.push(...uploads);
+      product.images.push(...uploads.map((u, i) => ({ ...u, color: newImageColors[i] || '' })));
     }
 
     await product.save();
